@@ -62,6 +62,7 @@ body::after{
   background:#fff;
   box-shadow:0 0 3px #fff,0 0 8px rgba(200,190,255,.6);
   animation:twinkle 4s ease-in-out infinite;
+  will-change:opacity;transform:translateZ(0);
 }
 .star-bright{
   background:#fff;
@@ -344,6 +345,12 @@ body::after{
 @keyframes resultFlash{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
 
 /* === MOBILE === */
+@media(max-width:768px){
+  .star-bright::before,.star-bright::after{content:none}
+  .mist{filter:blur(60px);opacity:.25}
+  .arcane-ring{display:none}
+  .hat-emoji::before{width:300%;height:300%}
+}
 @media(max-width:560px){
   .page{padding:2rem 1rem}
   .welcome-title{font-size:1.6rem}
@@ -525,7 +532,9 @@ let answers = { round1: [], round2: [], round3: [] };
 // ── Stars ──
 (function initStars(){
   const c = document.getElementById("stars");
-  for(let i=0;i<250;i++){
+  const isMobile=window.innerWidth<768;
+  const count=isMobile?80:250;
+  for(let i=0;i<count;i++){
     const s=document.createElement("div");
     const isBright=Math.random()<0.15;
     s.className="star"+(isBright?" star-bright":"");
