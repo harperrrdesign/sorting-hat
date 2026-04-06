@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>设计师分院帽</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ravenclaw:#5B8DEF;
+  --gryffindor:#E05A6D;
+  --slytherin:#4ECB71;
+  --hufflepuff:#E8B84B;
+}
+html,body{
+  min-height:100vh;
+  background:#07060E;
+  color:rgba(255,255,255,.9);
+  font-family:-apple-system,"PingFang SC","Helvetica Neue",sans-serif;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+body{
+  background:
+    radial-gradient(circle at 20% 20%,rgba(90,40,160,.15),transparent 35%),
+    radial-gradient(circle at 80% 15%,rgba(60,35,140,.12),transparent 30%),
+    radial-gradient(circle at 50% 80%,rgba(100,30,90,.12),transparent 40%),
+    linear-gradient(180deg,#08040F 0%,#0E081A 40%,#090512 100%);
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  opacity:.035;
+  mix-blend-mode:screen;
+}
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,.6) 100%);
+}
+
+/* === ATMOSPHERE === */
+.atmosphere{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.mist{
+  position:absolute;border-radius:50%;
+  filter:blur(100px);opacity:.4;mix-blend-mode:screen;
+  animation:mistDrift 24s ease-in-out infinite;
+}
+.mist-a{width:35vw;height:35vw;left:5%;top:10%;background:radial-gradient(circle,rgba(100,50,180,.4) 0%,transparent 70%)}
+.mist-b{width:30vw;height:30vw;right:10%;top:30%;background:radial-gradient(circle,rgba(130,50,150,.3) 0%,transparent 70%);animation-delay:-8s;animation-direction:reverse}
+.mist-c{width:40vw;height:35vw;left:25%;bottom:5%;background:radial-gradient(circle,rgba(60,40,160,.3) 0%,transparent 70%);animation-delay:-16s}
+.arcane-ring{
+  position:absolute;border-radius:50%;
+  border:1px solid rgba(255,255,255,.015);
+  box-shadow:none;
+}
+.ring-a{width:40vw;height:40vw;left:-10%;bottom:-15%;animation:spinSlow 40s linear infinite}
+.ring-b{width:25vw;height:25vw;right:5%;top:8%;animation:spinSlow 30s linear infinite reverse}
+
+.stars{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+.star{
+  position:absolute;border-radius:50%;
+  background:#fff;
+  box-shadow:0 0 3px #fff,0 0 8px rgba(200,190,255,.6);
+  animation:twinkle 4s ease-in-out infinite;
+}
+.star-bright{
+  background:#fff;
+  box-shadow:0 0 6px #fff,0 0 15px rgba(200,190,255,.9),0 0 40px rgba(150,130,240,.6),0 0 80px rgba(120,100,220,.3);
+}
+.star-bright::before{
+  content:"";position:absolute;
+  left:50%;top:50%;transform:translate(-50%,-50%);
+  width:200%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);
+}
+.star-bright::after{
+  content:"";position:absolute;
+  left:50%;top:50%;transform:translate(-50%,-50%);
+  width:1px;height:200%;
+  background:linear-gradient(180deg,transparent,rgba(255,255,255,.6),transparent);
+}
+
+/* === PAGES === */
+.site-shell{position:relative;z-index:2}
+.page{
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;padding:3rem 1.5rem;
+  opacity:0;transition:opacity .4s ease;
+}
+.page.active{display:flex;opacity:1;animation:fadeUp .6s ease both}
+.page.fade-out{opacity:0}
+
+/* === NO CARD BOXES — content floats freely === */
+.card{background:none;border:none;box-shadow:none;border-radius:0;width:100%;max-width:560px;overflow:visible}
+.card-frame{padding:0}
+.card::before,.card::after,.card-frame::before,.card-frame::after{content:none}
+
+/* === BUTTONS === */
+.btn-row,.btn-group{display:flex;flex-wrap:wrap;gap:.75rem;justify-content:center;margin-top:2rem}
+.btn{
+  padding:.75rem 1.8rem;border:1px solid rgba(255,255,255,.12);border-radius:999px;
+  background:rgba(255,255,255,.06);color:rgba(255,255,255,.85);
+  font-size:.9rem;font-family:inherit;cursor:pointer;
+  transition:background .2s,border-color .2s;
+  letter-spacing:.02em;
+}
+.btn:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2)}
+.btn::before{content:none}
+.btn-primary{background:rgba(30,20,60,.7);border-color:rgba(255,255,255,.15);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.btn-primary:hover{background:rgba(50,35,90,.8)}
+.btn-secondary{opacity:.7}
+.btn-secondary:hover{opacity:1}
+.btn-danger{background:rgba(200,50,40,.3);border-color:rgba(200,50,40,.3);color:rgba(255,200,200,.9)}
+.btn-danger:hover{background:rgba(200,50,40,.5)}
+.btn-sm{padding:.45rem .9rem;font-size:.8rem}
+
+/* === INPUT === */
+.input-field{
+  width:100%;padding:.8rem 1rem;border-radius:10px;
+  border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);
+  color:#fff;font-size:.95rem;font-family:inherit;
+  transition:border-color .2s;
+}
+.input-field:focus{outline:none;border-color:rgba(255,255,255,.25)}
+.input-field::placeholder{color:rgba(255,255,255,.3)}
+
+/* === WELCOME === */
+.welcome-card{max-width:480px;text-align:center;overflow:visible}
+.hat-emoji{
+  display:block;text-align:center;font-size:5rem;line-height:1;
+  margin-bottom:1.5rem;position:relative;
+  animation:gentleFloat 4s ease-in-out infinite, hatGlow 3s ease-in-out infinite;
+}
+.hat-emoji::before{
+  content:"";position:absolute;
+  left:50%;top:50%;transform:translate(-50%,-50%);
+  width:400%;height:400%;border-radius:50%;z-index:-1;
+  background:radial-gradient(circle,rgba(100,60,200,.15) 0%,rgba(80,40,180,.05) 30%,transparent 55%);
+  filter:blur(25px);
+  animation:auraBreath 4s ease-in-out infinite;pointer-events:none;
+}
+.welcome-title{
+  font-size:2rem;font-weight:600;letter-spacing:.04em;
+  margin-bottom:.75rem;
+  background:linear-gradient(135deg,rgba(255,255,255,.7),#fff,rgba(200,195,230,.7));
+  background-size:200% auto;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  animation:shimmer 6s linear infinite;
+}
+.welcome-sub{
+  font-size:.95rem;line-height:1.7;color:rgba(255,255,255,.5);
+  margin-bottom:0;
+}
+.welcome-actions .btn-primary{
+  animation:softPulse 3s ease-in-out infinite;
+}
+
+/* === QUESTIONS === */
+.questions-card{max-width:620px}
+.round-header{display:none}
+
+#questionsContainer{display:flex;flex-direction:column;gap:.6rem}
+.question-item{
+  display:flex;align-items:flex-start;gap:.85rem;
+  padding:1rem 1.1rem;border-radius:12px;
+  border:1px solid rgba(255,255,255,.1);
+  background:rgba(20,15,40,.6);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  cursor:pointer;transition:background .15s,border-color .15s;
+  animation:fadeUp .4s ease both;
+}
+.question-item:nth-child(2){animation-delay:.06s}
+.question-item:nth-child(3){animation-delay:.12s}
+.question-item::after{content:none}
+.question-item:hover{background:rgba(30,25,60,.7);border-color:rgba(255,255,255,.15)}
+.question-item.checked{background:rgba(80,60,160,.2);border-color:rgba(130,120,200,.35)}
+.question-item.checked::after{content:none}
+
+.question-item input[type="checkbox"]{
+  appearance:none;-webkit-appearance:none;
+  width:20px;height:20px;border-radius:6px;flex-shrink:0;margin-top:.15rem;
+  border:1.5px solid rgba(255,255,255,.15);background:rgba(255,255,255,.03);
+  cursor:pointer;position:relative;transition:all .15s;
+}
+.question-item input[type="checkbox"]:checked{
+  background:rgba(130,120,200,.3);border-color:rgba(160,150,220,.4);
+}
+.question-item input[type="checkbox"]:checked::after{
+  content:"\2713";position:absolute;inset:0;display:grid;place-items:center;
+  color:rgba(255,255,255,.85);font-size:.8rem;font-weight:600;
+}
+.question-text{font-size:.92rem;line-height:1.65;color:rgba(255,255,255,.75);user-select:none}
+
+/* === THINKING — the most magical page === */
+.thinking-card{max-width:500px;text-align:center;background:none !important;border:none !important;box-shadow:none !important;overflow:visible !important}
+.thinking-card .card-frame{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:60vh;gap:.5rem;
+}
+#page-thinking.active .thinking-card{animation:none !important}
+#page-thinking .hat-emoji{
+  font-size:5rem;margin-bottom:1rem;
+  animation:gentleFloat 3s ease-in-out infinite, hatGlow 2s ease-in-out infinite;
+}
+.thinking-title{font-size:1.3rem;font-weight:500;color:rgba(255,255,255,.6);margin-bottom:.5rem}
+.thinking-runes{position:absolute;inset:0;pointer-events:none}
+.thinking-runes span{
+  position:absolute;width:5px;height:5px;border-radius:50%;
+  background:rgba(180,170,250,.7);
+  box-shadow:0 0 16px rgba(150,140,230,.6),0 0 40px rgba(120,110,200,.35),0 0 80px rgba(100,90,180,.15);
+  animation:orbFloat 6s ease-in-out infinite;
+  font-size:0;color:transparent;overflow:hidden;
+}
+.thinking-runes span:nth-child(1){left:15%;top:20%;animation-delay:0s}
+.thinking-runes span:nth-child(2){right:15%;top:25%;animation-delay:.8s}
+.thinking-runes span:nth-child(3){left:22%;bottom:25%;animation-delay:1.5s}
+.thinking-runes span:nth-child(4){right:20%;bottom:22%;animation-delay:2.2s}
+.thinking-runes span:nth-child(5){left:50%;top:12%;animation-delay:2.8s}
+.thinking-runes span:nth-child(6){left:55%;bottom:15%;animation-delay:3.5s}
+
+.thinking-phases{position:relative;width:100%;height:2.5rem;margin-bottom:.5rem}
+.thinking-phase{
+  position:absolute;inset:0;display:grid;place-items:center;
+  color:rgba(255,255,255,.5);font-size:1.05rem;opacity:0;
+}
+.phase-1{animation:phaseIn .8s ease .5s both}
+.phase-2{animation:phaseIn .8s ease 1.8s both}
+.phase-3{animation:phaseIn .8s ease 3.0s both}
+.phase-4{animation:phaseStay .8s ease 4.2s both}
+
+.thinking-dots{
+  display:flex;gap:.4rem;justify-content:center;
+  font-size:1rem;color:rgba(255,255,255,.3);
+}
+.thinking-dots span{animation:dotPulse 1.4s ease-in-out infinite}
+.thinking-dots span:nth-child(2){animation-delay:.2s}
+.thinking-dots span:nth-child(3){animation-delay:.4s}
+
+/* === RESULT === */
+.result-card{max-width:600px}
+.result-container{text-align:center}
+.result-hat{
+  display:block;font-size:4rem;margin-bottom:.5rem;
+  animation:gentleFloat 4s ease-in-out infinite;
+  filter:drop-shadow(0 0 20px rgba(120,100,220,.25));
+}
+.result-type{
+  display:inline-block;font-size:2.5rem;font-weight:700;
+  margin:.5rem 0 1.2rem;line-height:1.1;
+  color:#fff !important;
+}
+.result-type::before,.result-type::after{content:none}
+.result-reveal{animation:revealSlam .8s cubic-bezier(.15,.9,.2,1.1) forwards}
+
+.result-form{max-width:320px;margin:0 auto 1.5rem;text-align:left}
+.result-label{display:block;font-size:.8rem;color:rgba(255,255,255,.4);margin-bottom:.4rem}
+
+.summary-section{
+  text-align:left;margin-top:1rem;padding:1rem;
+  border-radius:12px;background:rgba(20,15,40,.5);
+  border:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+}
+.summary-round{margin-bottom:.75rem}
+.summary-round:last-child{margin-bottom:0}
+.summary-round-title{font-weight:600;font-size:.85rem;margin-bottom:.3rem;display:flex;align-items:center;gap:.5rem;color:rgba(255,255,255,.7)}
+.summary-round-title .score-badge{
+  display:inline-block;padding:.15rem .45rem;border-radius:999px;font-size:.7rem;color:rgba(255,255,255,.85);
+}
+.summary-item{
+  font-size:.82rem;color:rgba(255,255,255,.45);padding:.15rem 0 .15rem 1rem;position:relative;
+}
+.summary-item::before{content:"·";position:absolute;left:.2rem;color:rgba(255,255,255,.3)}
+
+/* === RECORDS === */
+.records-page{max-width:700px;margin:0 auto;width:100%}
+.records-shell{padding:0;background:none;border:none;box-shadow:none}
+.records-shell::before,.records-shell::after{content:none}
+.records-page h2{text-align:center;font-size:1.5rem;font-weight:600;color:rgba(255,255,255,.8);margin-bottom:1.5rem}
+.filter-bar{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-bottom:1.5rem}
+.filter-btn{
+  padding:.4rem .8rem;border-radius:999px;font-size:.75rem;
+  border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.03);
+  color:rgba(255,255,255,.5);cursor:pointer;font-family:inherit;
+  transition:all .15s;
+}
+.filter-btn.active,.filter-btn:hover{
+  background:rgba(255,255,255,.08);color:rgba(255,255,255,.85);
+  border-color:rgba(255,255,255,.15);
+}
+#recordsList{position:relative;z-index:1}
+.record-card{
+  display:flex;flex-wrap:wrap;align-items:center;gap:.7rem;
+  padding:.85rem 1rem;margin-bottom:.5rem;border-radius:10px;
+  border:1px solid rgba(255,255,255,.08);background:rgba(20,15,40,.5);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  color:rgba(255,255,255,.8);
+}
+.record-name{min-width:5rem;font-size:.95rem;font-weight:600}
+.record-type{
+  display:inline-block;padding:.2rem .65rem;border-radius:999px;
+  font-size:.72rem;font-weight:600;color:rgba(255,255,255,.85);
+}
+.record-scores{font-size:.8rem;color:rgba(255,255,255,.4)}
+.record-time{flex:1;min-width:10rem;color:rgba(255,255,255,.3);font-size:.8rem}
+.record-actions{margin-left:auto}
+.records-actions{margin-top:1.5rem}
+.no-records{text-align:center;color:rgba(255,255,255,.3);padding:3rem 0;font-size:.95rem}
+
+/* === KEYFRAMES === */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@keyframes gentleFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shimmer{0%{background-position:200% center}100%{background-position:-200% center}}
+@keyframes softPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}50%{box-shadow:0 0 20px 2px rgba(255,255,255,.06)}}
+@keyframes twinkle{0%,100%{opacity:.1}50%{opacity:.8}}
+@keyframes auraBreath{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.7}50%{transform:translate(-50%,-50%) scale(1.15);opacity:1}}
+@keyframes mistDrift{0%,100%{transform:translate(0,0)}50%{transform:translate(3vw,2vh)}}
+@keyframes spinSlow{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes hatGlow{
+  0%,100%{filter:drop-shadow(0 0 20px rgba(120,100,220,.3)) drop-shadow(0 0 40px rgba(80,60,180,.1))}
+  50%{filter:drop-shadow(0 0 50px rgba(140,120,240,.6)) drop-shadow(0 0 100px rgba(100,80,220,.35)) drop-shadow(0 0 150px rgba(80,60,180,.15))}
+}
+@keyframes orbFloat{
+  0%,100%{transform:translate(0,0) scale(1);opacity:.3}
+  25%{transform:translate(8px,-12px) scale(1.3);opacity:.6}
+  50%{transform:translate(-5px,-20px) scale(.8);opacity:.4}
+  75%{transform:translate(12px,-8px) scale(1.1);opacity:.7}
+}
+@keyframes phaseIn{0%{opacity:0;transform:translateY(6px)}40%{opacity:.7;transform:none}100%{opacity:0;transform:translateY(-4px)}}
+@keyframes phaseStay{0%{opacity:0;transform:translateY(6px)}100%{opacity:.7;transform:none}}
+@keyframes dotPulse{0%,80%,100%{opacity:.15;transform:scale(1)}40%{opacity:.6;transform:scale(1.2)}}
+@keyframes revealSlam{0%{opacity:0;transform:scale(1.8);filter:blur(12px)}100%{opacity:1;transform:scale(1);filter:none}}
+@keyframes thinkingPulse{0%,100%{box-shadow:0 0 40px rgba(120,100,220,.05)}50%{box-shadow:0 0 120px rgba(120,100,220,.25),0 0 200px rgba(80,60,180,.1)}}
+@keyframes questionRise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+/* Thinking — no card pulse, hat glow handles the magic */
+
+/* Result overlay flash */
+#page-result::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
+  opacity:0;background:radial-gradient(circle at center,rgba(120,100,220,.15),transparent 60%);
+}
+#page-result.active::before{animation:resultFlash .8s ease-out both}
+@keyframes resultFlash{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
+
+/* === MOBILE === */
+@media(max-width:560px){
+  .page{padding:2rem 1rem}
+  .welcome-title{font-size:1.6rem}
+  .round-title{font-size:1.25rem}
+  .result-type{font-size:2rem}
+  .record-card{flex-direction:column;align-items:flex-start}
+  .record-actions{margin-left:0}
+  .btn-group{flex-direction:column}
+  .btn{width:100%;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div class="atmosphere" aria-hidden="true">
+  <span class="mist mist-a"></span>
+  <span class="mist mist-b"></span>
+  <span class="mist mist-c"></span>
+  <span class="arcane-ring ring-a"></span>
+  <span class="arcane-ring ring-b"></span>
+</div>
+
+<div class="stars" id="stars"></div>
+
+<main class="site-shell">
+  <!-- PAGE: Welcome -->
+  <section class="page active welcome-page" id="page-welcome">
+    <div class="card welcome-card">
+      <div class="card-frame">
+        <span class="hat-emoji">🧙‍♂️</span>
+        <h1 class="welcome-title">设计师分院帽</h1>
+        <p class="welcome-sub">每位设计师都有独特的天赋与倾向。<br>让分院帽为你的团队成员找到最契合的归属。</p>
+        <div class="btn-row welcome-actions">
+          <button class="btn btn-primary" onclick="startAssessment()">开始分院</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE: Questions -->
+  <section class="page questions-page" id="page-questions">
+    <div class="card questions-card">
+      <div class="card-frame">
+        <div class="round-header">
+          <span class="round-badge" id="roundBadge">第一关</span>
+          <h2 class="round-title" id="roundTitle">AI自驱型</h2>
+          <div class="progress-cluster">
+            <div class="progress-meter" aria-hidden="true">
+              <span class="progress-fill"></span>
+            </div>
+            <p class="round-progress" id="roundProgress">第1题 / 共6题</p>
+          </div>
+        </div>
+        <div id="questionsContainer"></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="nextStep()">下一步</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE: Thinking -->
+  <section class="page thinking-page" id="page-thinking">
+    <div class="card thinking-card">
+      <div class="card-frame">
+        <div class="thinking-runes" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <span class="hat-emoji">🧙‍♂️</span>
+        <h2 class="thinking-title">分院帽正在思考...</h2>
+        <div class="thinking-phases">
+          <p class="thinking-phase phase-1">嗯...</p>
+          <p class="thinking-phase phase-2">我看到了...</p>
+          <p class="thinking-phase phase-3">是的...</p>
+          <p class="thinking-phase phase-4">就是...</p>
+        </div>
+        <div class="thinking-dots"><span>●</span><span>●</span><span>●</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE: Result -->
+  <section class="page result-page" id="page-result">
+    <div class="card result-container result-card" id="resultCard">
+      <div class="card-frame">
+        <span class="result-hat">🧙‍♂️</span>
+        <h1 class="result-type result-reveal" id="resultType"></h1>
+        <div class="result-form">
+          <label class="result-label">记录此人姓名（可选）</label>
+          <input type="text" class="input-field" id="nameInput" placeholder="输入姓名..." autocomplete="off">
+        </div>
+        <div class="summary-section" id="resultSummary"></div>
+        <div class="btn-group">
+          <button class="btn btn-primary" onclick="saveAndNext()">记录并评估下一位</button>
+          <button class="btn btn-secondary" onclick="goToPage('page-records')">查看所有记录</button>
+          <button class="btn btn-secondary" onclick="exportJSON()">导出记录</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE: Records -->
+  <section class="page" id="page-records">
+    <div class="records-page">
+      <div class="records-shell">
+        <h2>分院记录</h2>
+        <div class="filter-bar" id="filterBar">
+          <button class="filter-btn active" data-filter="all" onclick="filterRecords('all',this)">全部</button>
+          <button class="filter-btn" data-filter="AI自驱型" onclick="filterRecords('AI自驱型',this)">AI自驱型</button>
+          <button class="filter-btn" data-filter="方案型" onclick="filterRecords('方案型',this)">方案型</button>
+          <button class="filter-btn" data-filter="执行力强" onclick="filterRecords('执行力强',this)">执行力强</button>
+          <button class="filter-btn" data-filter="需要关注" onclick="filterRecords('需要关注',this)">需要关注</button>
+        </div>
+        <div id="recordsList"></div>
+        <div class="btn-group records-actions">
+          <button class="btn btn-primary" onclick="exportJSON()">导出JSON</button>
+          <button class="btn btn-secondary" onclick="exportCSV()">导出CSV</button>
+          <button class="btn btn-secondary" onclick="goToPage('page-welcome')">返回首页</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+// ── Data ──
+const QUESTIONS = {
+  round1: [
+    "在工作项目中交付过不是设计稿的东西（原型、代码、网页、工具、脚本）",
+    "用AI完成过本来用传统方式做的工作任务（竞品分析、写文案、做用研总结等）",
+    "在群里或会上分享过AI工具或用法",
+    "做过一个别人用上了的模板、工具或流程",
+    "工作方式跟团队其他人明显不同——用的工具或流程跟大家不一样",
+    "他用的某个AI工具或方法是自己找来的，不是团队统一安排或别人教的"
+  ],
+  round2: [
+    "出过不止一种设计方案供选择（给了几个方向让团队挑）",
+    "提出过一个被采纳了的不同思路",
+    "没有完整需求时自己先出了方案推动项目",
+    "独立交付过完整项目不需要你全程盯",
+    "交付的设计被开发直接用了没打回大改",
+    "PM或协作方主动点名要跟他合作过"
+  ],
+  round3: [
+    "接到过临时插入的紧急需求，扛住了按时交付",
+    "同时接过多个项目的活，都没掉链子",
+    "出的设计稿被开发或PM提到过细节好/还原度高/规范到位",
+    "被安排去支援别人的项目，顺畅完成没有摩擦",
+    "给他安排过不熟悉或不是他偏好的活，他也接了做完了",
+    "你有紧急或繁重的活第一个想到交给他"
+  ]
+};
+
+const ROUND_META = {
+  round1: { label: "第一关", title: "AI自驱型", badgeClass: "r1", type: "AI自驱型", color: "#2A4B8D" },
+  round2: { label: "第二关", title: "方案型", badgeClass: "r2", type: "方案型", color: "#9B1B30" },
+  round3: { label: "第三关", title: "执行型", badgeClass: "r3", type: "执行力强", color: "#1A5632" }
+};
+
+const TYPE_COLORS = {
+  "AI自驱型": "#5B8DEF",
+  "方案型": "#E05A6D",
+  "执行力强": "#4ECB71",
+  "需要关注": "#E8B84B"
+};
+
+// ── State ──
+let currentName = "";
+let currentResultType = "";
+let currentRound = "round1";
+let currentPageInRound = 0;
+let answers = { round1: [], round2: [], round3: [] };
+
+// ── Stars ──
+(function initStars(){
+  const c = document.getElementById("stars");
+  for(let i=0;i<250;i++){
+    const s=document.createElement("div");
+    const isBright=Math.random()<0.15;
+    s.className="star"+(isBright?" star-bright":"");
+    s.style.left=Math.random()*100+"%";
+    s.style.top=Math.random()*100+"%";
+    s.style.animationDelay=Math.random()*5+"s";
+    s.style.animationDuration=(2+Math.random()*4)+"s";
+    const size=isBright?(1.5+Math.random()*2):(0.5+Math.random()*1.5);
+    s.style.width=s.style.height=size+"px";
+    c.appendChild(s);
+  }
+})();
+
+// ── Navigation ──
+function goToPage(id){
+  document.querySelectorAll(".page.active").forEach(p=>{p.classList.add("fade-out")});
+  setTimeout(()=>{
+    document.querySelectorAll(".page").forEach(p=>{p.classList.remove("active","fade-out")});
+    const next=document.getElementById(id);
+    next.classList.add("active");
+    if(id==="page-records") renderRecords();
+  },300);
+}
+
+// ── Assessment ──
+function startAssessment(){
+  currentName="";
+  currentRound="round1";
+  currentPageInRound=0;
+  answers={round1:[],round2:[],round3:[]};
+  showQuestions();
+  goToPage("page-questions");
+}
+
+function showQuestions(){
+  const meta=ROUND_META[currentRound];
+  const badge=document.getElementById("roundBadge");
+  badge.textContent=meta.label;
+  badge.className="round-badge "+meta.badgeClass;
+  document.getElementById("roundTitle").textContent=meta.title;
+
+  const start=currentPageInRound*3;
+  const end=start+3;
+  const qs=QUESTIONS[currentRound].slice(start,end);
+  document.getElementById("roundProgress").textContent=
+    "第"+(start+1)+"~"+(end)+"题 / 共6题";
+
+  const container=document.getElementById("questionsContainer");
+  container.innerHTML="";
+  qs.forEach((q,i)=>{
+    const idx=start+i;
+    const checked=answers[currentRound].includes(idx);
+    const div=document.createElement("div");
+    div.className="question-item"+(checked?" checked":"");
+    div.innerHTML=`<input type="checkbox" id="q${idx}" ${checked?"checked":""}><span class="question-text">${q}</span>`;
+    div.addEventListener("click",e=>{
+      if(e.target.tagName==="INPUT")return;
+      const cb=div.querySelector("input");cb.checked=!cb.checked;
+      cb.dispatchEvent(new Event("change"));
+    });
+    const cb=div.querySelector("input");
+    cb.addEventListener("change",()=>{
+      if(cb.checked){if(!answers[currentRound].includes(idx))answers[currentRound].push(idx);div.classList.add("checked")}
+      else{answers[currentRound]=answers[currentRound].filter(x=>x!==idx);div.classList.remove("checked")}
+    });
+    container.appendChild(div);
+  });
+}
+
+function nextStep(){
+  if(currentPageInRound===0){
+    currentPageInRound=1;
+    showQuestions();
+    return;
+  }
+  const score=answers[currentRound].length;
+  if(score>=4){
+    showResult(ROUND_META[currentRound].type);
+  } else if(currentRound==="round1"){
+    currentRound="round2";currentPageInRound=0;showQuestions();
+  } else if(currentRound==="round2"){
+    currentRound="round3";currentPageInRound=0;showQuestions();
+  } else {
+    showResult("需要关注");
+  }
+}
+
+function showResult(type){
+  goToPage("page-thinking");
+  setTimeout(()=>{
+    buildResult(type);
+    goToPage("page-result");
+  },5500);
+}
+
+function buildResult(type){
+  document.getElementById("nameInput").value="";
+  currentResultType=type;
+  const typeEl=document.getElementById("resultType");
+  typeEl.textContent=type;
+  typeEl.style.color=TYPE_COLORS[type];
+  typeEl.classList.remove("result-reveal");
+  void typeEl.offsetWidth;
+  typeEl.classList.add("result-reveal");
+
+  const summaryEl=document.getElementById("resultSummary");
+  summaryEl.innerHTML="";
+  const roundsToShow=["round1"];
+  if(currentRound==="round2"||currentRound==="round3") roundsToShow.push("round2");
+  if(currentRound==="round3") roundsToShow.push("round3");
+
+  roundsToShow.forEach(r=>{
+    const meta=ROUND_META[r];
+    const score=answers[r].length;
+    const div=document.createElement("div");div.className="summary-round";
+    div.innerHTML=`<div class="summary-round-title">${meta.title} <span class="score-badge" style="background:${TYPE_COLORS[meta.type]||meta.color}">${score}/6</span></div>`;
+    answers[r].forEach(idx=>{
+      const p=document.createElement("p");p.className="summary-item";
+      p.textContent=QUESTIONS[r][idx];div.appendChild(p);
+    });
+    if(answers[r].length===0){
+      const p=document.createElement("p");p.style.cssText="font-size:.82rem;color:rgba(255,255,255,.25);padding-left:1rem";
+      p.textContent="（无勾选项）";div.appendChild(p);
+    }
+    summaryEl.appendChild(div);
+  });
+}
+
+function saveRecord(type){
+  const records=getRecords();
+  const roundData={};
+  ["round1","round2","round3"].forEach(r=>{
+    const didRound=(r==="round1")||(r==="round2"&&(currentRound==="round2"||currentRound==="round3"))||(r==="round3"&&currentRound==="round3");
+    if(didRound){
+      roundData[r]={score:answers[r].length,answers:answers[r].map(i=>QUESTIONS[r][i])};
+    } else {
+      roundData[r]=null;
+    }
+  });
+  records.push({
+    id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),
+    name:currentName,type,
+    timestamp:new Date().toLocaleString("zh-CN"),
+    rounds:roundData
+  });
+  localStorage.setItem("sortingHatRecords",JSON.stringify(records));
+}
+
+function getRecords(){
+  try{return JSON.parse(localStorage.getItem("sortingHatRecords"))||[]}catch(e){return[]}
+}
+
+function saveAndNext(){
+  currentName=document.getElementById("nameInput").value.trim()||"未命名";
+  saveRecord(currentResultType);
+  document.getElementById("nameInput").value="";
+  startAssessment();
+}
+
+function nextPerson(){
+  startAssessment();
+}
+
+// ── Records ──
+let currentFilter="all";
+function filterRecords(filter,btn){
+  currentFilter=filter;
+  document.querySelectorAll(".filter-btn").forEach(b=>b.classList.remove("active"));
+  if(btn)btn.classList.add("active");
+  renderRecords();
+}
+
+function renderRecords(){
+  const records=getRecords();
+  const filtered=currentFilter==="all"?records:records.filter(r=>r.type===currentFilter);
+  const list=document.getElementById("recordsList");
+  if(filtered.length===0){
+    list.innerHTML='<div class="no-records">暂无记录</div>';return;
+  }
+  list.innerHTML=filtered.map(r=>{
+    const scores=["round1","round2","round3"].map((rd,i)=>{
+      if(r.rounds[rd])return `R${i+1}:${r.rounds[rd].score}/6`;return `R${i+1}:-`;
+    }).join(" · ");
+    return `<div class="record-card">
+      <span class="record-name">${esc(r.name)}</span>
+      <span class="record-type" style="background:${TYPE_COLORS[r.type]||'#555'}">${r.type}</span>
+      <span class="record-scores">${scores}</span>
+      <span class="record-time">${r.timestamp}</span>
+      <span class="record-actions"><button class="btn btn-danger btn-sm" onclick="deleteRecord('${r.id}')">删除</button></span>
+    </div>`;
+  }).join("");
+}
+
+function deleteRecord(id){
+  if(!confirm("确定删除这条记录？"))return;
+  const records=getRecords().filter(r=>r.id!==id);
+  localStorage.setItem("sortingHatRecords",JSON.stringify(records));
+  renderRecords();
+}
+
+function esc(s){const d=document.createElement("div");d.textContent=s;return d.innerHTML}
+
+// ── Export ──
+function exportJSON(){
+  const data=JSON.stringify(getRecords(),null,2);
+  download(data,"sorting-hat-records.json","application/json");
+}
+function exportCSV(){
+  const records=getRecords();
+  const header="name,type,timestamp,round1_score,round2_score,round3_score\n";
+  const rows=records.map(r=>{
+    const s=rd=>r.rounds[rd]?r.rounds[rd].score:"";
+    return [r.name,r.type,r.timestamp,s("round1"),s("round2"),s("round3")].map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",");
+  }).join("\n");
+  download("\uFEFF"+header+rows,"sorting-hat-records.csv","text/csv;charset=utf-8");
+}
+function download(content,filename,mime){
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([content],{type:mime}));
+  a.download=filename;a.click();
+}
+</script>
+</body>
+</html>
