@@ -22,10 +22,47 @@ html,body{
 }
 body{
   background:
+    /* stars — static white dots */
+    radial-gradient(circle at 12% 8%, #fff 0.5px, transparent 0.5px),
+    radial-gradient(circle at 45% 3%, #fff 0.4px, transparent 0.4px),
+    radial-gradient(circle at 78% 6%, #fff 0.6px, transparent 0.6px),
+    radial-gradient(circle at 92% 12%, #fff 0.3px, transparent 0.3px),
+    radial-gradient(circle at 5% 25%, #fff 0.5px, transparent 0.5px),
+    radial-gradient(circle at 33% 18%, #fff 0.4px, transparent 0.4px),
+    radial-gradient(circle at 60% 15%, #fff 0.7px, transparent 0.7px),
+    radial-gradient(circle at 85% 22%, #fff 0.3px, transparent 0.3px),
+    radial-gradient(circle at 18% 35%, #fff 0.5px, transparent 0.5px),
+    radial-gradient(circle at 50% 30%, #fff 0.4px, transparent 0.4px),
+    radial-gradient(circle at 72% 33%, #fff 0.6px, transparent 0.6px),
+    radial-gradient(circle at 95% 38%, #fff 0.3px, transparent 0.3px),
+    radial-gradient(circle at 8% 48%, #fff 0.4px, transparent 0.4px),
+    radial-gradient(circle at 28% 45%, #fff 0.5px, transparent 0.5px),
+    radial-gradient(circle at 55% 42%, #fff 0.3px, transparent 0.3px),
+    radial-gradient(circle at 82% 50%, #fff 0.6px, transparent 0.6px),
+    radial-gradient(circle at 15% 58%, #fff 0.5px, transparent 0.5px),
+    radial-gradient(circle at 40% 55%, #fff 0.4px, transparent 0.4px),
+    radial-gradient(circle at 65% 52%, #fff 0.3px, transparent 0.3px),
+    radial-gradient(circle at 90% 60%, #fff 0.5px, transparent 0.5px),
+    radial-gradient(circle at 3% 68%, #fff 0.4px, transparent 0.4px),
+    radial-gradient(circle at 25% 72%, #fff 0.6px, transparent 0.6px),
+    radial-gradient(circle at 48% 65%, #fff 0.3px, transparent 0.3px),
+    radial-gradient(circle at 70% 70%, #fff 0.5px, transparent 0.5px),
+    radial-gradient(circle at 88% 75%, #fff 0.4px, transparent 0.4px),
+    radial-gradient(circle at 10% 82%, #fff 0.5px, transparent 0.5px),
+    radial-gradient(circle at 35% 85%, #fff 0.3px, transparent 0.3px),
+    radial-gradient(circle at 58% 80%, #fff 0.6px, transparent 0.6px),
+    radial-gradient(circle at 80% 88%, #fff 0.4px, transparent 0.4px),
+    radial-gradient(circle at 22% 92%, #fff 0.5px, transparent 0.5px),
+    radial-gradient(circle at 52% 95%, #fff 0.3px, transparent 0.3px),
+    radial-gradient(circle at 75% 93%, #fff 0.5px, transparent 0.5px),
+    radial-gradient(circle at 93% 96%, #fff 0.4px, transparent 0.4px),
+    /* nebula glow — static */
     radial-gradient(circle at 20% 20%,rgba(90,40,160,.15),transparent 35%),
-    radial-gradient(circle at 80% 15%,rgba(60,35,140,.12),transparent 30%),
-    radial-gradient(circle at 50% 80%,rgba(100,30,90,.12),transparent 40%),
+    radial-gradient(circle at 75% 25%,rgba(60,35,140,.1),transparent 30%),
+    radial-gradient(circle at 50% 75%,rgba(80,30,120,.1),transparent 40%),
+    /* base */
     linear-gradient(180deg,#08040F 0%,#0E081A 40%,#090512 100%);
+  background-attachment:fixed;
 }
 body::before{
   content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
@@ -38,48 +75,8 @@ body::after{
   background:radial-gradient(ellipse at center,transparent 30%,rgba(0,0,0,.6) 100%);
 }
 
-/* === ATMOSPHERE === */
-.atmosphere{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
-.mist{
-  position:absolute;border-radius:50%;
-  filter:blur(100px);opacity:.4;mix-blend-mode:screen;
-  animation:mistDrift 24s ease-in-out infinite;
-}
-.mist-a{width:35vw;height:35vw;left:5%;top:10%;background:radial-gradient(circle,rgba(100,50,180,.4) 0%,transparent 70%)}
-.mist-b{width:30vw;height:30vw;right:10%;top:30%;background:radial-gradient(circle,rgba(130,50,150,.3) 0%,transparent 70%);animation-delay:-8s;animation-direction:reverse}
-.mist-c{width:40vw;height:35vw;left:25%;bottom:5%;background:radial-gradient(circle,rgba(60,40,160,.3) 0%,transparent 70%);animation-delay:-16s}
-.arcane-ring{
-  position:absolute;border-radius:50%;
-  border:1px solid rgba(255,255,255,.015);
-  box-shadow:none;
-}
-.ring-a{width:40vw;height:40vw;left:-10%;bottom:-15%;animation:spinSlow 40s linear infinite}
-.ring-b{width:25vw;height:25vw;right:5%;top:8%;animation:spinSlow 30s linear infinite reverse}
-
-.stars{position:fixed;inset:0;pointer-events:none;z-index:1;overflow:hidden}
-.star{
-  position:absolute;border-radius:50%;
-  background:#fff;
-  box-shadow:0 0 3px #fff,0 0 8px rgba(200,190,255,.6);
-  animation:twinkle 4s ease-in-out infinite;
-  will-change:opacity;transform:translateZ(0);
-}
-.star-bright{
-  background:#fff;
-  box-shadow:0 0 6px #fff,0 0 15px rgba(200,190,255,.9),0 0 40px rgba(150,130,240,.6),0 0 80px rgba(120,100,220,.3);
-}
-.star-bright::before{
-  content:"";position:absolute;
-  left:50%;top:50%;transform:translate(-50%,-50%);
-  width:200%;height:1px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.6),transparent);
-}
-.star-bright::after{
-  content:"";position:absolute;
-  left:50%;top:50%;transform:translate(-50%,-50%);
-  width:1px;height:200%;
-  background:linear-gradient(180deg,transparent,rgba(255,255,255,.6),transparent);
-}
+/* === ATMOSPHERE — all static, no animations === */
+.atmosphere,.stars{display:none}
 
 /* === PAGES === */
 .site-shell{position:relative;z-index:2}
@@ -313,10 +310,7 @@ body::after{
 @keyframes gentleFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 @keyframes shimmer{0%{background-position:200% center}100%{background-position:-200% center}}
 @keyframes softPulse{0%,100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}50%{box-shadow:0 0 20px 2px rgba(255,255,255,.06)}}
-@keyframes twinkle{0%,100%{opacity:.1}50%{opacity:.8}}
 @keyframes auraBreath{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.7}50%{transform:translate(-50%,-50%) scale(1.15);opacity:1}}
-@keyframes mistDrift{0%,100%{transform:translate(0,0)}50%{transform:translate(3vw,2vh)}}
-@keyframes spinSlow{from{transform:rotate(0)}to{transform:rotate(360deg)}}
 @keyframes hatGlow{
   0%,100%{filter:drop-shadow(0 0 20px rgba(120,100,220,.3)) drop-shadow(0 0 40px rgba(80,60,180,.1))}
   50%{filter:drop-shadow(0 0 50px rgba(140,120,240,.6)) drop-shadow(0 0 100px rgba(100,80,220,.35)) drop-shadow(0 0 150px rgba(80,60,180,.15))}
@@ -344,12 +338,12 @@ body::after{
 #page-result.active::before{animation:resultFlash .8s ease-out both}
 @keyframes resultFlash{0%{opacity:0}30%{opacity:1}100%{opacity:0}}
 
-/* === MOBILE === */
+/* === MOBILE — kill all infinite animations === */
 @media(max-width:768px){
-  .star-bright::before,.star-bright::after{content:none}
-  .mist{filter:blur(60px);opacity:.25}
-  .arcane-ring{display:none}
-  .hat-emoji::before{width:300%;height:300%}
+  *{animation-iteration-count:1 !important}
+  .hat-emoji,.hat-emoji::before,.thinking-dots span,.thinking-runes span{animation:none !important}
+  .hat-emoji{filter:drop-shadow(0 0 30px rgba(120,100,220,.4))}
+  .hat-emoji::before{transform:translate(-50%,-50%) scale(1);opacity:.8}
 }
 @media(max-width:560px){
   .page{padding:2rem 1rem}
@@ -529,24 +523,7 @@ let currentRound = "round1";
 let currentPageInRound = 0;
 let answers = { round1: [], round2: [], round3: [] };
 
-// ── Stars ──
-(function initStars(){
-  const c = document.getElementById("stars");
-  const isMobile=window.innerWidth<768;
-  const count=isMobile?80:250;
-  for(let i=0;i<count;i++){
-    const s=document.createElement("div");
-    const isBright=Math.random()<0.15;
-    s.className="star"+(isBright?" star-bright":"");
-    s.style.left=Math.random()*100+"%";
-    s.style.top=Math.random()*100+"%";
-    s.style.animationDelay=Math.random()*5+"s";
-    s.style.animationDuration=(2+Math.random()*4)+"s";
-    const size=isBright?(1.5+Math.random()*2):(0.5+Math.random()*1.5);
-    s.style.width=s.style.height=size+"px";
-    c.appendChild(s);
-  }
-})();
+// ── Stars: static background, no JS needed ──
 
 // ── Navigation ──
 function goToPage(id){
